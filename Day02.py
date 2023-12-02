@@ -76,7 +76,7 @@ For each game, find the minimum set of cubes that must have been present. What i
 """
 
 # import numpy as np
-import re
+# import re
 
 
 def convert_input():
@@ -135,5 +135,4 @@ def part2():
 
 
 if __name__ == "__main__":
-    print(convert_input()[5])
-    print(part2())
+    print(part1())
