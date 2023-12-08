@@ -97,10 +97,10 @@ for m in maps[:-1]:
     mapping[m[:3]] = (m[7:10], m[12:15])
 
 
-def count_steps(start_position, part = 0):
+def count_steps(start_position, part=0):
     position = start_position
     steps = 0
-    while 0 < 1:
+    while True:
         for instruction in instructions:
             if instruction == 'L':
                 position = mapping[position][0]
