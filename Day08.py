@@ -119,7 +119,7 @@ def part2():
     positions = list()
     for m in mapping:
         if m[2] == 'A':
-            positions.append(m[:3])
+            positions.append(m)
 
     steps = list()
     for position in positions:
