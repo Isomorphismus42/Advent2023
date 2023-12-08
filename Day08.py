@@ -126,6 +126,9 @@ def part2():
         steps.append(count_steps(position, 1))
     return np.lcm.reduce(steps, dtype='int64')
 
+# Dies funktioniert nur, weil die Distanz von '..A' nach '..Z' im Input genauso lange ist, wie die Distanz von '..Z'
+# nach '..Z'!
+
 
 if __name__ == "__main__":
     print(part2())
