@@ -155,9 +155,9 @@ def part2():
     with open('inputs/input_day9', 'r') as file:
         for line in file:
             sequences = create_sequences(line)
-            prev_value = sequences[0][0]
-            for i, sequence in enumerate(sequences[1:]):
-                prev_value += ((-1) ** (i+1)) * sequence[0]
+            prev_value = 0
+            for i, sequence in enumerate(sequences):
+                prev_value += ((-1) ** i) * sequence[0]
             sum_extrapolated_values += prev_value
     return sum_extrapolated_values
 
