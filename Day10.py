@@ -323,19 +323,6 @@ def part2():
                 parity_matrix[i, j] = 0
             elif not parity:
                 parity_matrix[i, j] = 0
-    for j in range(n):
-        parity = False
-        last = ''
-        for i in range(m):
-            if (i, j) in circle:
-                edge = field[i][j]
-                if edge == '-' or (edge == 'L' and last == '7') or (edge == 'J' and last == 'F'):
-                    parity = not parity
-                    last = ''
-                elif edge in {'7', 'L', 'J', 'F'}:
-                    last = edge
-            elif not parity:
-                parity_matrix[i, j] = 0
     return int(np.sum(parity_matrix))
 
 
