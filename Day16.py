@@ -1,0 +1,177 @@
+"""
+--- Day 16: The Floor Will Be Lava ---
+
+With the beam of light completely focused somewhere, the reindeer leads you deeper still into the Lava Production
+Facility. At some point, you realize that the steel facility walls have been replaced with cave, and the doorways are
+just cave, and the floor is cave, and you're pretty sure this is actually just a giant cave.
+
+Finally, as you approach what must be the heart of the mountain, you see a bright light in a cavern up ahead. There,
+you discover that the beam of light you so carefully focused is emerging from the cavern wall closest to the facility
+and pouring all of its energy into a contraption on the opposite side.
+
+Upon closer inspection, the contraption appears to be a flat, two-dimensional square grid containing empty space (.),
+mirrors (/ and \), and splitters (| and -).
+
+The contraption is aligned so that most of the beam bounces around the grid, but each tile on the grid converts some
+of the beam's light into heat to melt the rock in the cavern.
+
+You note the layout of the contraption (your puzzle input). For example:
+
+.|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....
+
+The beam enters in the top-left corner from the left and heading to the right. Then, its behavior depends on what it
+encounters as it moves:
+
+    If the beam encounters empty space (.), it continues in the same direction. If the beam encounters a mirror (/ or
+    \), the beam is reflected 90 degrees depending on the angle of the mirror. For instance, a rightward-moving beam
+    that encounters a / mirror would continue upward in the mirror's column, while a rightward-moving beam that
+    encounters a \ mirror would continue downward from the mirror's column. If the beam encounters the pointy end of
+    a splitter (| or -), the beam passes through the splitter as if the splitter were empty space. For instance,
+    a rightward-moving beam that encounters a - splitter would continue in the same direction. If the beam encounters
+    the flat side of a splitter (| or -), the beam is split into two beams going in each of the two directions the
+    splitter's pointy ends are pointing. For instance, a rightward-moving beam that encounters a | splitter would
+    split into two beams: one that continues upward from the splitter's column and one that continues downward from
+    the splitter's column.
+
+Beams do not interact with other beams; a tile can have many beams passing through it at the same time. A tile is
+energized if that tile has at least one beam pass through it, reflect in it, or split in it.
+
+In the above example, here is how the beam of light bounces around the contraption:
+
+>|<<<\....
+|v-.\^....
+.v...|->>>
+.v...v^.|.
+.v...v^...
+.v...v^..\
+.v../2\\..
+<->-/vv|..
+.|<<<2-|.\
+.v//.|.v..
+
+Beams are only shown on empty tiles; arrows indicate the direction of the beams. If a tile contains beams moving in
+multiple directions, the number of distinct directions is shown instead. Here is the same diagram but instead only
+showing whether a tile is energized (#) or not (.):
+
+######....
+.#...#....
+.#...#####
+.#...##...
+.#...##...
+.#...##...
+.#..####..
+########..
+.#######..
+.#...#.#..
+
+Ultimately, in this example, 46 tiles become energized.
+
+The light isn't energizing enough tiles to produce lava; to debug the contraption, you need to start by analyzing the
+current situation. With the beam starting in the top-left heading right, how many tiles end up being energized?
+
+
+
+
+------------------- Part Two --------------------
+
+
+
+"""
+
+import numpy as np
+# import re
+# from collections import OrderedDict
+# import functools
+
+square_grid = open('inputs/input_day16', 'r').read().splitlines()
+square_grid = np.array([list(line) for line in square_grid])
+
+
+def calculate_energized_tiles(start_position):
+    positions = [start_position]
+    seen_positions = set()
+    energized = set()
+
+    def move_step():
+        x, y, orientation = position
+        if orientation == 'r' and y < square_grid.shape[1] - 1:
+            next_position = square_grid[x, y + 1]
+            if next_position in '.-':
+                positions.append((x, y + 1, 'r'))
+            elif next_position == '\\':
+                positions.append((x, y + 1, 'd'))
+            elif next_position == '/':
+                positions.append((x, y + 1, 'u'))
+            elif next_position == "|":
+                positions.append((x, y + 1, 'd'))
+                positions.append((x, y + 1, 'u'))
+        elif orientation == 'l' and y > 0:
+            next_position = square_grid[x, y - 1]
+            if next_position in '.-':
+                positions.append((x, y - 1, 'l'))
+            elif next_position == '\\':
+                positions.append((x, y - 1, 'u'))
+            elif next_position == '/':
+                positions.append((x, y - 1, 'd'))
+            elif next_position == "|":
+                positions.append((x, y - 1, 'd'))
+                positions.append((x, y - 1, 'u'))
+        elif orientation == 'd' and x < square_grid.shape[0] - 1:
+            next_position = square_grid[x + 1, y]
+            if next_position in '.|':
+                positions.append((x + 1, y, 'd'))
+            elif next_position == '\\':
+                positions.append((x + 1, y, 'r'))
+            elif next_position == '/':
+                positions.append((x + 1, y, 'l'))
+            elif next_position == "-":
+                positions.append((x + 1, y, 'l'))
+                positions.append((x + 1, y, 'r'))
+        elif orientation == 'u' and x > 0:
+            next_position = square_grid[x - 1, y]
+            if next_position in '.|':
+                positions.append((x - 1, y, 'u'))
+            elif next_position == '\\':
+                positions.append((x - 1, y, 'l'))
+            elif next_position == '/':
+                positions.append((x - 1, y, 'r'))
+            elif next_position == "-":
+                positions.append((x - 1, y, 'l'))
+                positions.append((x - 1, y, 'r'))
+
+    while positions:
+        position = positions.pop(0)
+        if position not in seen_positions:
+            seen_positions.add(position)
+            energized.add(position[:-1])
+            move_step()
+    return len(energized)
+
+
+def part1():
+    return calculate_energized_tiles((0, -1, 'r')) - 1
+
+
+def part2():
+    max_energized_tiles = 0
+    m, n = square_grid.shape
+    for i in range(m):
+        max_energized_tiles = max(calculate_energized_tiles((i, -1, 'r')) - 1, max_energized_tiles)
+        max_energized_tiles = max(calculate_energized_tiles((i, m, 'l')) - 1, max_energized_tiles)
+    for j in range(n):
+        max_energized_tiles = max(calculate_energized_tiles((-1, j, 'd')) - 1, max_energized_tiles)
+        max_energized_tiles = max(calculate_energized_tiles((n, j, 'u')) - 1, max_energized_tiles)
+    return max_energized_tiles
+
+
+if __name__ == "__main__":
+    print(part2())
