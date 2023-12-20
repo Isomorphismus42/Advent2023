@@ -84,41 +84,46 @@ heat_map = open('inputs/input_day17', 'r').read().splitlines()
 heat_map = np.array([list(line) for line in heat_map]).astype(int)
 
 
-def calculate_heat(start_node):
+def calculate_heat(start_node, max_steps, min_steps=0):
+    start_node = (*start_node, 's' * max_steps)
     queue = [start_node]
     seen = set()
     m, n = heat_map.shape[0] - 1, heat_map.shape[1] - 1
     while queue:
         distance, x, y, last_steps = heapq.heappop(queue)
-        if (x, y) == (m, n):
-            return distance, queue
+        if (x, y) == (m, n) and last_steps[-min_steps:] in {c * min_steps for c in 'udlr'}:
+            return distance
         if x > 0 and (x - 1, y, last_steps[1:] + 'u') not in seen:
-            if last_steps + 'u' != 'uuuu' and last_steps[-1] != 'd':
-                heapq.heappush(queue, (distance + heat_map[x - 1, y], x - 1, y, last_steps[1:] + 'u'))
-                seen.add((x - 1, y, last_steps[1:] + 'u'))
+            if last_steps + 'u' != 'u' * (max_steps + 1) and last_steps[-1] != 'd':
+                if not min_steps or last_steps[-min_steps:] in {c * min_steps for c in 'lrs'} or last_steps[-1] == 'u':
+                    heapq.heappush(queue, (distance + heat_map[x - 1, y], x - 1, y, last_steps[1:] + 'u'))
+                    seen.add((x - 1, y, last_steps[1:] + 'u'))
         if x < m and (x + 1, y, last_steps[1:] + 'd') not in seen:
-            if last_steps + 'd' != 'dddd' and last_steps[-1] != 'u':
-                heapq.heappush(queue, (distance + heat_map[x + 1, y], x + 1, y, last_steps[1:] + 'd'))
-                seen.add((x + 1, y, last_steps[1:] + 'd'))
+            if last_steps + 'd' != 'd' * (max_steps + 1) and last_steps[-1] != 'u':
+                if not min_steps or last_steps[-min_steps:] in {c * min_steps for c in 'lrs'} or last_steps[-1] == 'd':
+                    heapq.heappush(queue, (distance + heat_map[x + 1, y], x + 1, y, last_steps[1:] + 'd'))
+                    seen.add((x + 1, y, last_steps[1:] + 'd'))
         if y > 0 and (x, y - 1, last_steps[1:] + 'l') not in seen:
-            if last_steps + 'l' != 'llll' and last_steps[-1] != 'r':
-                heapq.heappush(queue, (distance + heat_map[x, y - 1], x, y - 1, last_steps[1:] + 'l'))
-                seen.add((x, y - 1, last_steps[1:] + 'l'))
+            if last_steps + 'l' != 'l' * (max_steps + 1) and last_steps[-1] != 'r':
+                if not min_steps or last_steps[-min_steps:] in {c * min_steps for c in 'dus'} or last_steps[-1] == 'l':
+                    heapq.heappush(queue, (distance + heat_map[x, y - 1], x, y - 1, last_steps[1:] + 'l'))
+                    seen.add((x, y - 1, last_steps[1:] + 'l'))
         if y < n and (x, y + 1, last_steps[1:] + 'r') not in seen:
-            if last_steps + 'r' != 'rrrr' and last_steps[-1] != 'l':
-                heapq.heappush(queue, (distance + heat_map[x, y + 1], x, y + 1, last_steps[1:] + 'r'))
-                seen.add((x, y + 1, last_steps[1:] + 'r'))
+            if last_steps + 'r' != 'r' * (max_steps + 1) and last_steps[-1] != 'l':
+                if not min_steps or last_steps[-min_steps:] in {c * min_steps for c in 'dus'} or last_steps[-1] == 'r':
+                    heapq.heappush(queue, (distance + heat_map[x, y + 1], x, y + 1, last_steps[1:] + 'r'))
+                    seen.add((x, y + 1, last_steps[1:] + 'r'))
 
 
 def part1():
-    heat, queue = calculate_heat((0, 0, 0, 'sss'))
+    heat = calculate_heat((0, 0, 0), 3)
     return heat
 
 
 def part2():
-    max_energized_tiles = 0
-    return max_energized_tiles
+    heat = calculate_heat((0, 0, 0), 10, 4)
+    return heat
 
 
 if __name__ == "__main__":
-    print(part1())
+    print(part2())
