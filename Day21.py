@@ -174,7 +174,7 @@ import numpy as np
 # import math
 
 
-up_to_date_map = open('inputs/input_day21 ', 'r').read().splitlines()
+up_to_date_map = open('inputs/input_day21_example', 'r').read().splitlines()
 up_to_date_map = np.array([list(line) for line in up_to_date_map])
 
 
@@ -204,12 +204,13 @@ def part1():
 
 def part2():
     start = tuple(np.argwhere(up_to_date_map == 'S')[0])
+    up_to_date_map[start] = '.'
     positions_even = 1
     positions_odd = 0
     queue = {start}
     even = True
     old_queue = set()
-    for n in range(64):  # 26501365
+    for n in range(1000):  # 26501365
         new_queue = set()
         for position in queue:
             x, y = position
